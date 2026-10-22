@@ -66,16 +66,12 @@
         </dependency>
         <!-- mybatis 依赖 end -->
         <!-- mysql begin -->
+        <!-- 8.0 版驱动同时支持 MySQL 5.7、MySQL 8 和 MariaDB；原来的 5.1.6 连不上 MySQL 8 -->
         <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <version>5.1.6</version>
+            <groupId>com.mysql</groupId>
+            <artifactId>mysql-connector-j</artifactId>
+            <version>8.0.33</version>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>mysql</groupId>-->
-<!--            <artifactId>mysql-connector-java</artifactId>-->
-<!--            <version>8.0.16</version>-->
-<!--        </dependency>-->
         <!-- jackson -->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
@@ -152,6 +148,17 @@
                 <configuration>
                     <source>8</source>
                     <target>8</target>
+                </configuration>
+            </plugin>
+            <!-- 不装 Tomcat 也能运行：mvn jetty:run，然后打开 http://localhost:8080/ -->
+            <plugin>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-maven-plugin</artifactId>
+                <version>9.4.57.v20241219</version>
+                <configuration>
+                    <webApp>
+                        <contextPath>/</contextPath>
+                    </webApp>
                 </configuration>
             </plugin>
         </plugins>

@@ -40,7 +40,7 @@ public class showquestionColntroller {
         Question question = questionService.SelectByQuestionID(question_id);
         Teacher teacher = teacherService.SelectByTeacherId(teacher_id);
         Student student = studentService.SelectByStudentId(question.getQuestion_poid());
-        if (teacher_id == "") {
+        if ("".equals(teacher_id)) {
             System.out.println("学生查看");
             ModelAndView modelAndView = new ModelAndView("question");
             modelAndView.addObject("question", question);

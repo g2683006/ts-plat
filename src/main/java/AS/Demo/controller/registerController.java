@@ -29,7 +29,7 @@ public class registerController {
     @RequestMapping("/register")
     public String register(HttpServletRequest request, Student student, Teacher teacher) throws UnsupportedEncodingException {
         request.setCharacterEncoding("UTF-8");
-        if (request.getParameter("jobtitle") == "") {
+        if ("".equals(request.getParameter("jobtitle"))) {
             student.setStudent_id(request.getParameter("id"));
             student.setStudent_password(request.getParameter("password"));
             student.setStudent_name(request.getParameter("name"));

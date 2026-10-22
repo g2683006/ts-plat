@@ -1,7 +1,7 @@
 # 网上辅导答疑系统（Online Q & A）
 
 学生在线提问、教师答疑的课程辅导网站，课程设计作业项目。
-后端是 Spring + Spring MVC + MyBatis（SSM），页面用 JSP，数据库用 MySQL，用 Maven 打成 war 包后部署到 Tomcat。
+后端是 Spring + Spring MVC + MyBatis（SSM），页面用 JSP，数据库用 MySQL。装好 JDK、Maven 和 MySQL 后，一条 `mvn jetty:run` 就能运行。
 
 ![登录页](docs/screenshots/login.png)
 
@@ -25,36 +25,39 @@
 | --- | --- |
 | 后端 | Spring 4.0、Spring MVC、MyBatis 3.3（XML 配置，没有用 Spring Boot） |
 | 页面 | JSP + JSTL，部分页面用 Bootstrap 3 和 jQuery |
-| 数据库 | MySQL 5.7（驱动 mysql-connector-java 5.1.6） |
-| 构建 | Maven，打包成 `target/Demo.war` |
+| 数据库 | MySQL 5.7 / 8.0 或 MariaDB（驱动 mysql-connector-j 8.0.33） |
+| 构建 | Maven；开发时用 `mvn jetty:run` 直接运行，也可以打包成 `target/Demo.war` 部署到 Tomcat |
 
 ## 运行
 
-需要：JDK 8 或更高、Maven 3、MySQL 5.7（或 MariaDB）、Tomcat 9。
-Tomcat 10 及以上不行，因为它们把 `javax.servlet` 换成了 `jakarta.servlet`。
+需要：JDK 8 或更高、Maven 3、MySQL（5.7、8.0 或 MariaDB 都可以）。不用另外装 Tomcat。
 
-2026-10 用 JDK 21 + MariaDB 10.11 + Tomcat 9.0.98 按下面的步骤实测过，上面的截图就是这样跑出来的。
+2026-10 用 JDK 21 + MySQL 8.0.46 实测过 `mvn jetty:run` 和 Tomcat 9.0.98 两种方式，MariaDB 10.11 也测过。上面的截图就是这样跑出来的。
 
-1. 建库并导入表结构和示例数据：
+1. 建库，导入表结构和示例数据：
 
    ```
-   mysql -uroot -p -e "CREATE DATABASE answer_system DEFAULT CHARSET utf8mb4;"
+   mysql -uroot -p -e "CREATE DATABASE answer_system DEFAULT CHARSET utf8mb4"
    mysql -uroot -p answer_system < sql/answer_system.sql
    ```
 
+   Windows 上如果 `mysql` 命令找不到，可以用 Navicat、MySQL Workbench 等工具新建 `answer_system` 库，再运行 `sql/answer_system.sql`。
+
 2. 打开 `src/main/resources/db.properties`，把数据库账号密码改成你自己的（默认是 `root` / `root`）。
 
-3. 打包：
+3. 在项目根目录（`pom.xml` 所在的目录）运行：
 
    ```
-   mvn package
+   mvn jetty:run
    ```
 
-4. 把 `target/Demo.war` 复制到 Tomcat 的 `webapps/` 目录。文件名就是访问路径，比如改名成 `answer.war`，启动 Tomcat 后打开 <http://localhost:8080/answer/>，会自动跳到登录页。
+   第一次运行会下载依赖，需要几分钟。看到 `Started Jetty Server` 后，用浏览器打开 <http://localhost:8080/>，会自动跳到登录页。按 `Ctrl+C` 停止。
 
-也可以用 IntelliJ IDEA 打开项目，配置一个本地 Tomcat 9，部署 `Demo:war exploded` 直接运行。
+**用 IDEA 运行**：用 IntelliJ IDEA 打开项目根目录，等 Maven 导入完成，在右侧 Maven 面板里依次展开 `Plugins` → `jetty`，双击 `jetty:run`。
 
-**MySQL 8 说明**：5.1.6 版驱动不支持 MySQL 8 默认的认证方式。可以改用 MySQL 5.7 或 MariaDB；也可以换成 `pom.xml` 里注释掉的 8.0.16 驱动，同时把 `db.properties` 里的 `jdbc.driver` 改成 `com.mysql.cj.jdbc.Driver`，并启用带 `serverTimezone` 的那行 URL。后一种方案没有实测过。
+**部署到 Tomcat**：运行 `mvn package` 得到 `target/Demo.war`，复制到 Tomcat 9 的 `webapps/` 目录。文件名就是访问路径，比如改名为 `answer.war`，访问地址就是 <http://localhost:8080/answer/>。Tomcat 10 及以上不行，因为它们把 `javax.servlet` 换成了 `jakarta.servlet`。
+
+**端口 8080 被占用时**：运行 `mvn jetty:run -Djetty.http.port=8081`。
 
 ## 示例账号
 
@@ -99,7 +102,7 @@ Tomcat 10 及以上不行，因为它们把 `javax.servlet` 换成了 `jakarta.s
 
 - 没有登录校验。页面靠 URL 参数区分用户，比如不登录直接访问 `/studentinfo.action?student_id=s2` 就能看到别人的资料，管理页面也一样。
 - 密码明文存储、明文比对；注册表单用 GET 提交，密码会出现在地址栏里。
-- 依赖版本很老（Spring 4.0.0 是 2013 年的版本，jackson-databind 2.5.0、mysql-connector-java 5.1.6 也一样），这些版本都有公开的安全漏洞。
+- 依赖版本很老（Spring 4.0.0 是 2013 年的版本，jackson-databind 2.5.0 也一样），这些版本都有公开的安全漏洞。
 
 ## 课题要求（原 README）
 
